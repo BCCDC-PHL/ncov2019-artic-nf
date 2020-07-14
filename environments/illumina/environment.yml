@@ -12,3 +12,4 @@ dependencies:
   - trim-galore=0.6.5
   - ivar=1.2.2
   - mafft=7.471
+  - pysam=0.15.2
