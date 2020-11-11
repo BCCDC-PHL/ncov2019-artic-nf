@@ -181,9 +181,8 @@ process alignConsensus {
         """
         mafft \
           --preservecase \
-          --auto \
           --keeplength \
-          --addfragments \
+          --add \
           ${consensus} \
           ${reference} \
           > ${sampleName}.with_ref.multi_line.alignment.fa
@@ -205,10 +204,9 @@ process trimUTR {
         tuple(sampleName, path("${sampleName}.primertrimmed.consensus.aln.utr_trimmed.fa"))
 
     script:
-        sed_string = '/^>/!s/.\\{265\\}\\(.\\{29410\\}\\).*$/\\1/'
         """
-        sed -e '${sed_string}' \
-          ${alignment} \
-          > ${sampleName}.primertrimmed.consensus.aln.utr_trimmed.fa
+        echo -e "\$(head -n 1 ${alignment} | cut -c 2-):256-29664" > non_utr.txt
+        samtools faidx ${alignment}
+        samtools faidx -r non_utr.txt ${alignment} > ${sampleName}.primertrimmed.consensus.aln.utr_trimmed.fa
         """
 }
