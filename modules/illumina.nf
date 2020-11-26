@@ -163,3 +163,50 @@ process cramToFastq {
         """
 }
 
+process alignConsensus {
+
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.primertrimmed.consensus.aln.fa", mode: 'copy'
+
+    input:
+        tuple(sampleName, path(consensus), path(reference))
+
+    output:
+        tuple(sampleName, path("${sampleName}.primertrimmed.consensus.aln.fa"))
+
+    script:
+        // Convert multi-line fasta to single line
+        awk_string = '/^>/ {printf("\\n%s\\n", $0); next; } { printf("%s", $0);}  END {printf("\\n");}'
+        """
+        mafft \
+          --preservecase \
+          --keeplength \
+          --add \
+          ${consensus} \
+          ${reference} \
+          > ${sampleName}.with_ref.multi_line.alignment.fa
+        awk '${awk_string}' ${sampleName}.with_ref.multi_line.alignment.fa > ${sampleName}.with_ref.single_line.alignment.fa
+        tail -n 2 ${sampleName}.with_ref.single_line.alignment.fa > ${sampleName}.primertrimmed.consensus.aln.fa
+        """
+}
+
+process trimUTR {
+
+    tag { sampleName }
+    executor 'local'
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.primertrimmed.consensus.aln.utr_trimmed.fa", mode: 'copy'
+
+    input:
+        tuple(sampleName, path(alignment))
+
+    output:
+        tuple(sampleName, path("${sampleName}.primertrimmed.consensus.aln.utr_trimmed.fa"))
+
+    script:
+        """
+        echo -e "\$(head -n 1 ${alignment} | cut -c 2-):256-29664" > non_utr.txt
+        samtools faidx ${alignment}
+        samtools faidx -r non_utr.txt ${alignment} > ${sampleName}.primertrimmed.consensus.aln.utr_trimmed.fa
+        """
+}

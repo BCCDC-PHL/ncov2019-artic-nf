@@ -11,3 +11,4 @@ dependencies:
   - samtools=1.9
   - trim-galore=0.6.5
   - ivar=1.2.2
+  - mafft=7.471
