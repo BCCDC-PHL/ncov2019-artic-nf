@@ -164,6 +164,10 @@ process cramToFastq {
 }
 
 process alignConsensus {
+    /**
+    * Aligns consensus sequence against reference using mafft. Uses the --keeplength
+    * flag to guarantee that all alignments remain the same length as the reference.
+    */
 
     tag { sampleName }
 
@@ -177,7 +181,7 @@ process alignConsensus {
 
     script:
         // Convert multi-line fasta to single line
-        awk_string = '/^>/ {printf("\\n%s\\n", $0); next; } { printf("%s", $0);}  END {printf("\\n");}'
+        awk_string = '/^>/ {printf("\\n%s\\n", $0); next; } { printf("%s", $0); }  END { printf("\\n"); }'
         """
         mafft \
           --preservecase \
@@ -192,9 +196,12 @@ process alignConsensus {
 }
 
 process trimUTR {
+    /**
+    * Trim the aligned consensus to remove 3' and 5' UTR sequences.
+    */
 
     tag { sampleName }
-    executor 'local'
+
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.primertrimmed.consensus.aln.utr_trimmed.fa", mode: 'copy'
 
     input:
@@ -204,9 +211,11 @@ process trimUTR {
         tuple(sampleName, path("${sampleName}.primertrimmed.consensus.aln.utr_trimmed.fa"))
 
     script:
+    awk_string = '/^>/ { printf("%s\\n", $0); next; } { printf("%s", $0); } END { printf("\\n"); }'
         """
-        echo -e "\$(head -n 1 ${alignment} | cut -c 2-):256-29664" > non_utr.txt
+        echo -e "\$(head -n 1 ${alignment} | cut -c 2-):266-29674" > non_utr.txt
         samtools faidx ${alignment}
-        samtools faidx -r non_utr.txt ${alignment} > ${sampleName}.primertrimmed.consensus.aln.utr_trimmed.fa
+        samtools faidx -r non_utr.txt ${alignment} > ${sampleName}.primertrimmed.consensus.aln.utr_trimmed.multi_line.fa
+        awk '${awk_string}' ${sampleName}.primertrimmed.consensus.aln.utr_trimmed.multi_line.fa > ${sampleName}.primertrimmed.consensus.aln.utr_trimmed.fa
         """
 }
