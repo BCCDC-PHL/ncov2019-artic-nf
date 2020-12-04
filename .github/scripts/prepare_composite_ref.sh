@@ -1,6 +1,8 @@
 #!/bin/bash
 set -eo pipefail
 
+export PATH=/opt/conda/bin:$PATH
+
 echo Prepare Composite Ref .. >> artifacts/test_artifact.log
 
 ref_storage_dir="${GITHUB_WORKSPACE}/composite_ref"
