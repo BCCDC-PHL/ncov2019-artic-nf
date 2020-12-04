@@ -23,7 +23,7 @@ jobs:
        export PATH=/opt/conda/bin:$PATH
        conda install -c bioconda bwa
     - name: Prepare composite reference sequence
-      run: bash .github/scripts/prepare_composite_ref.sh
+      run: bash .github/scripts/prepare_composite_ref.sh 2> artifacts/test_artifact.log
     - name: test PR outputs against previous release
       run: bash .github/scripts/test_PR_against_release.sh
     - name: test --cache conda environment 
