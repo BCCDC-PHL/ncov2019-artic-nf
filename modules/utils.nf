@@ -1,4 +1,9 @@
 process performHostFilter {
+
+    tag { sampleId }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleId}_hostfiltered_*.fastq.gz", mode: 'copy'
+
     input:
         tuple(val(sampleId), path(forward), path(reverse))
     output:
