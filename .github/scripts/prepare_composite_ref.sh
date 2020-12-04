@@ -4,6 +4,7 @@ set -eo pipefail
 echo Prepare Composite Ref .. >> artifacts/test_artifact.log
 
 ref_storage_dir="/github/home/composite_ref"
+mkdir ${ref_storage_dir}
 
 # get the GRCh38 human genome
 # as per https://lh3.github.io/2017/11/13/which-human-reference-genome-to-use
