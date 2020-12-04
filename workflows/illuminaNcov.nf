@@ -12,6 +12,7 @@ include {trimPrimerSequences} from '../modules/illumina.nf'
 include {callVariants} from '../modules/illumina.nf'
 include {makeConsensus} from '../modules/illumina.nf' 
 include {cramToFastq} from '../modules/illumina.nf'
+include {performHostFilter} from '../modules/utils'
 include {alignConsensus} from '../modules/illumina.nf'
 include {trimUTR} from '../modules/illumina.nf'
 
@@ -139,9 +140,12 @@ workflow ncovIllumina {
       // Build or download fasta, index and bedfile as required
       prepareReferenceFiles()
       
+      // filter out any host reads
+      performHostFilter(ch_filePairs)
+
       // Actually do analysis
-      sequenceAnalysis(ch_filePairs, prepareReferenceFiles.out.bwaindex, prepareReferenceFiles.out.bedfile)
- 
+      sequenceAnalysis(performHostFilter.out, prepareReferenceFiles.out.bwaindex, prepareReferenceFiles.out.bedfile)
+
       // Upload files to CLIMB
       if ( params.upload ) {
         
