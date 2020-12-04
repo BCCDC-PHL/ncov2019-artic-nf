@@ -25,6 +25,8 @@ jobs:
        export PATH=/opt/conda/bin:$PATH
        conda install -c bioconda nextflow
        NXF_VER=20.03.0-edge nextflow -version
+    - name: Prepare composite reference sequence
+      run: bash .github/scripts/prepare_composite_ref.sh
     - name: test PR outputs against previous release
       run: bash .github/scripts/test_PR_against_release.sh
     - name: test -profile sanger
