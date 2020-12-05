@@ -18,3 +18,4 @@ curl -s "https://raw.githubusercontent.com/BCCDC-PHL/artic-ncov2019/master/prime
 # create composite reference of human and virus for competitive bwt mapping 
 # based host removal
 cat ${ref_storage_dir}/GRC38_no_alt_analysis_set.fna ${ref_storage_dir}/nCoV-2019.reference.fasta > ${ref_storage_dir}/composite_human_viral_reference.fna
+
