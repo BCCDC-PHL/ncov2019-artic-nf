@@ -6,8 +6,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: create artifacts dir to save test logs
-      run: mkdir artifacts
+    - name: create logs dir to save logs
+      run: mkdir logs
     - name: install Conda
       run: bash .github/scripts/install_conda.sh
     - name: install bwa via Conda
@@ -15,8 +15,15 @@ jobs:
        export PATH=/opt/conda/bin:$PATH
        conda install -c bioconda bwa
     - name: Prepare composite reference sequence
-      run: bash .github/scripts/prepare_composite_ref.sh 2> artifacts/prepare_composite_ref_artifact.log
+      run: bash .github/scripts/prepare_composite_ref_index.sh 2> logs/prepare_composite_ref_index.log
+    - name: Upload Composite Reference Index
     - uses: actions/upload-artifact@v2
       with:
         name: composite-reference-index
         path: $GITHUB_WORKSPACE/composite_ref/composite_human_viral_reference.fna.*
+    - name: Upload Additional Artifacts
+    - uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: prepare_composite_ref_logs
+        path: logs
