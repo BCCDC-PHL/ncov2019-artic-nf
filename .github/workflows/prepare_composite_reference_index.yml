@@ -1,4 +1,4 @@
-name: Prepare Composite Reference
+name: Prepare Composite Reference Index
 on: [workflow_dispatch]
 jobs:
   prepare_composite_ref:
