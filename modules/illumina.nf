@@ -163,7 +163,7 @@ process cramToFastq {
         """
 }
 
-process alignConsensus {
+process alignConsensusToReference {
     /**
     * Aligns consensus sequence against reference using mafft. Uses the --keeplength
     * flag to guarantee that all alignments remain the same length as the reference.
@@ -195,7 +195,7 @@ process alignConsensus {
         """
 }
 
-process trimUTR {
+process trimUTRFromAlignment {
     /**
     * Trim the aligned consensus to remove 3' and 5' UTR sequences.
     */
