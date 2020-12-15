@@ -27,6 +27,35 @@ process readTrimming {
     """
 }
 
+process filterResidualAdapters {
+    /**
+    * Discard reads that contain residual adapter sequences that indicate trimming may have failed
+    * @input tuple(sampleName, path(forward), path(reverse))
+    * @output untrim_filter_out tuple(sampleName, path("*_val_1.fq.gz"), path("*_val_2.fq.gz"))
+    */
+
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: '*{1,2}_posttrim_filter.fq.gz', mode: 'copy'
+
+    cpus 2
+
+    input:
+    tuple(sampleName, path(forward), path(reverse))
+
+    output:
+    tuple(sampleName, path("*1_posttrim_filter.fq.gz"), path("*2_posttrim_filter.fq.gz")) optional true
+
+    script:
+    """
+    if [[ \$(gunzip -c ${forward} | head -n4 | wc -l) -eq 0 ]]; then
+      exit 0
+    else
+      filter_residual_adapters.py --input_R1 $forward --input_R2 $reverse 
+    fi
+    """
+}
+
 process indexReference {
     /**
     * Indexes reference fasta file in the scheme repo using bwa.
@@ -97,7 +126,7 @@ process trimPrimerSequences {
         """
         samtools view -F4 -o ${sampleName}.mapped.bam ${bam}
         samtools index ${sampleName}.mapped.bam
-        ${ivarCmd} -i ${sampleName}.mapped.bam -b ${bedfile} -m ${params.illuminaKeepLen} -q ${params.illuminaQualThreshold} -p ivar.out
+        ${ivarCmd} -i ${sampleName}.mapped.bam -b ${bedfile} -m ${params.illuminaKeepLen} -q ${params.illuminaQualThreshold} -f ${params.primer_pairs_tsv} -p ivar.out
         samtools sort -o ${sampleName}.mapped.primertrimmed.sorted.bam ivar.out.bam
         """
 }
@@ -116,6 +145,7 @@ process callVariants {
 
     script:
         """
+        samtools faidx ${ref}
         samtools mpileup -A -d 0 --reference ${ref} -B -Q 0 ${bam} |\
         ivar variants -r ${ref} -m ${params.ivarMinDepth} -p ${sampleName}.variants -q ${params.ivarMinVariantQuality} -t ${params.ivarMinFreqThreshold}
         """

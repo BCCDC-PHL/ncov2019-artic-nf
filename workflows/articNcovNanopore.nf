@@ -17,11 +17,6 @@ include {bamToCram} from '../modules/out.nf'
 
 include {collateSamples} from '../modules/upload.nf'
 
-
-// import subworkflows
-include {CLIMBrsync} from './upload.nf'
-
-
 // workflow component for artic pipeline
 workflow sequenceAnalysisNanopolish {
     take:
@@ -132,13 +127,4 @@ workflow articNcovNanopore {
       } else if ( params.medaka ) {
           sequenceAnalysisMedaka(ch_fastqDirs)
       }
-
-      if ( params.upload ) {
-
-        Channel.fromPath("${params.CLIMBkey}")
-               .set{ ch_CLIMBkey }
-
-        CLIMBrsync(sequenceAnalysis.out.qc_pass, ch_CLIMBkey )
-      }
 }
-

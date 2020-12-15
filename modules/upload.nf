@@ -31,18 +31,3 @@ process prepareUploadDirectory {
     """
 }
 
-
-process uploadToCLIMB {
-    tag { params.prefix }
-
-    input:
-    tuple(path(sshkey), path(uploadDir))
-
-    output:
-
-    script:
-    """
-    rsync -Lav -e "ssh -i ${sshkey} -l ${params.CLIMBUser}" ${uploadDir} ${params.CLIMBHostname}:upload/
-    """
-}
-
