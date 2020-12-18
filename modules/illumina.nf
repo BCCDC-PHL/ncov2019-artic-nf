@@ -129,7 +129,7 @@ process trimPrimerSequences {
         samtools index ${sampleName}.mapped.bam
         ${ivarCmd} -i ${sampleName}.mapped.bam -b ${bedfile} -m ${params.illuminaKeepLen} -q ${params.illuminaQualThreshold} -f ${params.primer_pairs_tsv} -p ivar.out
         samtools sort -o ${sampleName}.mapped.primertrimmed.sorted.bam ivar.out.bam
-	samtools index ${sampleName}.mapped.primertrimmed.sorted.bam
+        samtools index ${sampleName}.mapped.primertrimmed.sorted.bam
         """
 }
 
