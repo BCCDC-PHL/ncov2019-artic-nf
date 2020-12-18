@@ -87,7 +87,10 @@ workflow sequenceAnalysis {
       ch_bedFile
 
     main:
-      readTrimming(ch_filePairs)
+
+      performHostFilter(ch_filePairs)
+
+      readTrimming(performHostFilter.out)
 
       filterResidualAdapters(readTrimming.out)
 
@@ -117,9 +120,7 @@ workflow sequenceAnalysis {
 
       writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
 
-      collateSamples(qc.pass.map{ it[0] }
-                           .join(makeConsensus.out, by: 0)
-                           .join(trimPrimerSequences.out.mapped))     
+      collateSamples(makeConsensus.out.join(performHostFilter.out.fastqPairs))
 
       if (params.outCram) {
         bamToCram(trimPrimerSequences.out.mapped.map{it[0] } 
@@ -138,12 +139,9 @@ workflow ncovIllumina {
     main:
       // Build or download fasta, index and bedfile as required
       prepareReferenceFiles()
-      
-      // filter out any host reads
-      performHostFilter(ch_filePairs)
 
       // Actually do analysis
-      sequenceAnalysis(performHostFilter.out, prepareReferenceFiles.out.bwaindex, prepareReferenceFiles.out.bedfile)
+      sequenceAnalysis(ch_filePairs, prepareReferenceFiles.out.bwaindex, prepareReferenceFiles.out.bedfile)
 }
 
 workflow ncovIlluminaCram {
