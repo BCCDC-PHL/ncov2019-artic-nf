@@ -88,7 +88,7 @@ process readMapping {
 
     label 'largecpu'
 
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.sorted.bam", mode: 'copy'
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.sorted.bam{.bai}", mode: 'copy'
 
     input:
         tuple sampleName, path(forward), path(reverse), path(ref), path("*")
@@ -100,6 +100,7 @@ process readMapping {
         """
         bwa mem -t ${task.cpus} ${ref} ${forward} ${reverse} | \
         samtools sort -o ${sampleName}.sorted.bam
+	samtools index ${sampleName}.sorted.bam
         """
 }
 
@@ -107,8 +108,8 @@ process trimPrimerSequences {
 
     tag { sampleName }
 
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.mapped.bam", mode: 'copy'
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.mapped.primertrimmed.sorted.bam", mode: 'copy'
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.mapped.bam{.bai}", mode: 'copy'
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.mapped.primertrimmed.sorted.bam{.bai}", mode: 'copy'
 
     input:
     tuple sampleName, path(bam), path(bedfile)
@@ -128,6 +129,7 @@ process trimPrimerSequences {
         samtools index ${sampleName}.mapped.bam
         ${ivarCmd} -i ${sampleName}.mapped.bam -b ${bedfile} -m ${params.illuminaKeepLen} -q ${params.illuminaQualThreshold} -f ${params.primer_pairs_tsv} -p ivar.out
         samtools sort -o ${sampleName}.mapped.primertrimmed.sorted.bam ivar.out.bam
+	samtools index ${sampleName}.mapped.primertrimmed.sorted.bam
         """
 }
 
