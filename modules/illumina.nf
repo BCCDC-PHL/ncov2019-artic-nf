@@ -100,7 +100,7 @@ process readMapping {
         """
         bwa mem -t ${task.cpus} ${ref} ${forward} ${reverse} | \
         samtools sort -o ${sampleName}.sorted.bam
-	samtools index ${sampleName}.sorted.bam
+        samtools index ${sampleName}.sorted.bam
         """
 }
 
