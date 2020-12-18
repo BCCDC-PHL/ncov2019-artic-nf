@@ -4,7 +4,7 @@ process collateSamples {
     publishDir "${params.outdir}/qc_pass_climb_upload/${params.prefix}", pattern: "${sampleName}", mode: 'copy'
 
     input:
-    tuple(sampleName, path(bam), path(fasta))
+    tuple(sampleName, path(bam), path(bam_index), path(fasta))
 
     output:
     path("${sampleName}")
