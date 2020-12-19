@@ -52,6 +52,7 @@ def filter_reads(contig_name, input_sam_fp, output_bam_fp):
         print(f"unmapped read count = {unmapped_reads} "
               f"(0.00%)", file=sys.stderr)
 
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description="Get all reads that are "
