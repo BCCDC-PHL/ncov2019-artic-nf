@@ -22,8 +22,9 @@ if (params.profile){
 }
 
 if ( params.illumina ) {
-   if ( !params.directory ) {
+   if ( !params.directory && params.samplesheet_input == "NO_FILE" ) {
        println("Please supply a directory containing fastqs or CRAMs with --directory. Specify --cram if supplying a CRAMs directory")
+       println("Or provide a samplesheet (headers: ID,R1,R2) with --samplesheet_input")
        println("Use --help to print help")
        System.exit(1)
    }
@@ -78,9 +79,16 @@ workflow {
                   .set{ ch_cramFiles }
        }
        else {
-	   Channel.fromFilePairs( params.fastqSearchPath, flat: true)
-	          .filter{ !( it[0] =~ /Undetermined/ ) }
-	          .set{ ch_filePairs }
+           if ( params.samplesheet_input != "NO_FILE" ) {
+		Channel.fromPath(params.samplesheet_input)
+		    .splitCsv(header: true).map{ it -> [it['ID'], it['R1'], it['R2']] }
+		    .set{ ch_filePairs }
+	    }
+	    else {
+		Channel.fromFilePairs( params.fastqSearchPath, flat: true)
+	            .filter{ !( it[0] =~ /Undetermined/ ) }
+	            .set{ ch_filePairs }
+	    }
        }
    }
    else {
