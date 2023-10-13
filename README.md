@@ -14,7 +14,7 @@ This Nextflow pipeline automates the ARTIC network [nCoV-2019 novel coronavirus 
 ##### Illumina
 
 ```
-nextflow run BCCDC-PHL/ncov2019-artic-nf [-profile conda,singularity,docker,slurm,lsf] \
+nextflow run BCCDC-PHL/ncov2019-artic-nf -profile conda \
   --illumina --prefix "output_file_prefix" \
   --primer_pairs_tsv /path/to/primer_pairs_tsv \
   --composite_ref /path/to/human_and_sars-cov-2_composite_ref \
@@ -26,6 +26,24 @@ You can also specify cram file output by passing the --outCram flag.
 For production use at large scale, where you will run the workflow many times, you can avoid cloning the scheme repository, creating an ivar bed file and indexing the reference every time by supplying both `--bed /path/to/ivar-compatible.bed` and `--ref /path/to/bwa-indexed/ref.fa`.
 
 Alternatively you can avoid just the cloning of the scheme repository to remain on a fixed revision of it over time by passing --schemeRepoURL /path/to/own/clone/of/github.com/artic-network/artic-ncov2019. This removes any internet access from the workflow except for the optional upload steps.
+
+###### SampleSheet Input
+
+Samples can also be provided to the pipeline via a `samplesheet.csv` file:
+
+```
+nextflow run BCCDC-PHL/ncov2019-artic-nf -profile conda \
+  --illumina --prefix "output_file_prefix" \
+  --primer_pairs_tsv /path/to/primer_pairs_tsv \
+  --composite_ref /path/to/human_and_sars-cov-2_composite_ref \
+  --samplesheet_input /path/to/samplesheet.csv
+```
+
+The `samplesheet.csv` file must include the headers:
+
+`ID,R1,R2`
+
+...and each record should be a comma-separated line consisting of the sample ID, the path to the R1 fastq file for that sample, and the path to the R2 fastq file for that sample.
 
 ##### Nanopore
 ###### Nanopolish
