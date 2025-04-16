@@ -1,7 +1,6 @@
-name: artic
+name: artic-ncov2019-nanopore
 channels:
   - conda-forge
   - bioconda
-  - defaults
 dependencies:
   - artic
